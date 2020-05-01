@@ -12,11 +12,13 @@ if (len(sys.argv)-1 != 1):
 case_url = str(sys.argv[1])
 print("URL: " + case_url)
 
-caseRegex = re.compile("^(https://.*cases/)(.*)(?:\?lang=\w{1,2})", flags=re.IGNORECASE)
-file_type_regex = re.compile("(jpeg|jpg|png|gif|tiff)$", flags=re.IGNORECASE)
+caseRegex = re.compile(r"^(https://.*cases/)(.*)(?:\?lang=(\w{1,3}))", flags=re.IGNORECASE)
+file_type_regex = re.compile(r"(jpeg|jpg|png|gif|tiff)$", flags=re.IGNORECASE)
 
 case_name = str(caseRegex.search(case_url)[2])
+lang = str(caseRegex.search(case_url)[3])
 print("case name:" + case_name)
+print("lang: " + lang)
 
 now = datetime.now()
 main_folder = case_name + "_" + str(datetime.now().strftime("%d_%m_%Y-%H_%M_%S"))
@@ -34,7 +36,7 @@ print("data-study-id: " + data_study_id)
 
 picture_stacks_url = "https://radiopaedia.org/studies/" + data_study_id + "/stacks"
 print("\nFetching study json from " + picture_stacks_url +" ...")
-PARAMS = {'lang':'us'}
+PARAMS = {'lang':lang}
 
 picture_stacks_json = requests.get(url = picture_stacks_url, params = PARAMS)
 data = picture_stacks_json.json()
