@@ -5,8 +5,8 @@ from datetime import datetime
 import re
 import sys
 
-if (len(sys.argv)-1 != 1):
-    print("Wrong number of arguments, musst provide radiopaedia case url!")
+if (len(sys.argv)-1 != 1 or "https://radiopaedia.org/cases/" not in sys.argv[1]):
+    print("Wrong argument, musst provide radiopaedia case url!")
     exit()
 
 case_url = str(sys.argv[1])

@@ -5,6 +5,7 @@
 
 #vs-code
 settings.json
+launch.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
