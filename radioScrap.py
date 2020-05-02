@@ -4,21 +4,22 @@ import os
 from datetime import datetime
 import re
 import sys
+from tqdm import tqdm
 
 if (len(sys.argv)-1 != 1 or "https://radiopaedia.org/cases/" not in sys.argv[1]):
-    print("Wrong argument, musst provide radiopaedia case url!")
+    print("Wrong argument, musst provide radiopaedia cases url!")
     exit()
 
 case_url = str(sys.argv[1])
-print("URL: " + case_url)
+print("URL:\t\t" + case_url)
 
 caseRegex = re.compile(r"^(https://.*cases/)(.*)(?:\?lang=(\w{1,3}))", flags=re.IGNORECASE)
 file_type_regex = re.compile(r"(jpeg|jpg|png|gif|tiff)$", flags=re.IGNORECASE)
 
 case_name = str(caseRegex.search(case_url)[2])
 lang = str(caseRegex.search(case_url)[3])
-print("case name:" + case_name)
-print("lang: " + lang)
+print("case name:\t" + case_name)
+print("lang:\t\t" + lang)
 
 now = datetime.now()
 main_folder = case_name + "_" + str(datetime.now().strftime("%d_%m_%Y-%H_%M_%S"))
@@ -31,7 +32,7 @@ main_html.html.render()
 div_1 = main_html.html.find('div.user-generated-content', first=True)
 div_2 = div_1.find('div.well.case-section.case-study', first=True)
 data_study_id = str(div_2.attrs['data-study-id'])
-print("data-study-id: " + data_study_id)
+print("Found data-study-id:\t" + data_study_id)
 
 
 picture_stacks_url = "https://radiopaedia.org/studies/" + data_study_id + "/stacks"
@@ -43,6 +44,7 @@ data = picture_stacks_json.json()
 print("Got study json!\n")
 
 counter = 1
+print("Found " + str(len(data)) + " image sets")
 for image_set in data:
     plane_projection = str(image_set["images"][0]["plane_projection"])
     aux_modality = str(image_set["images"][0]["aux_modality"])
@@ -50,8 +52,8 @@ for image_set in data:
     folder = str(main_folder + "/" + sub_folder_name)
     os.mkdir(folder)
     images = image_set["images"]
-    print("Downloading images for " + sub_folder_name + " ...")
-    for image in images:
+    print("Downloading " + str(len(images)) + " images for set " + sub_folder_name + " ...")
+    for image in tqdm(images):
         img_url = image["fullscreen_filename"]
         image_id = image["id"]
         img_file = requests.get(img_url)
