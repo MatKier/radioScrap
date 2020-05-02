@@ -8,6 +8,7 @@ import pathlib
 
 #Helper function for getting all images associated with a specific data-study-id
 def scrapeStudy(data_study_id):
+    global sub_folder_counter
     picture_stacks_url = "https://radiopaedia.org/studies/" + data_study_id + "/stacks"
     print("Fetching study json from " + picture_stacks_url +" ...")
     PARAMS = {'lang':lang}
@@ -16,26 +17,29 @@ def scrapeStudy(data_study_id):
     data = picture_stacks_json.json()
     print("Got study json!")
 
-    counter = 1
     print("Found " + str(len(data)) + " image sets in study " + data_study_id)
+    # one image_set is one "modality" / "images" element in the json data
     for image_set in data:
-        plane_projection = str(image_set["images"][0]["plane_projection"]).replace("/", " per ")
-        aux_modality = str(image_set["images"][0]["aux_modality"]).replace("/", " per ")
-        sub_folder_name = str(counter) + "_" + plane_projection + "_" + aux_modality
+        modality = str(image_set["modality"])
+        plane_projection = str(image_set["images"][0]["plane_projection"])
+        aux_modality = str(image_set["images"][0]["aux_modality"])
+        sub_folder_name = (str(sub_folder_counter) + "_" + modality + "_" + plane_projection + "_" + aux_modality).replace("/", " per ")
         folder = str(main_folder + "/" + sub_folder_name)
         pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
         images = image_set["images"]
-        print("Downloading " + str(len(images)) + " images for set " + sub_folder_name + " ...")
+        print("Downloading " + str(len(images)) + " images for set \"" + sub_folder_name + "\" ...")
         for image in tqdm(images):
             img_url = image["fullscreen_filename"]
             image_id = image["id"]
             img_file = requests.get(img_url)
             file_type = "." + str(file_type_regex.search(img_url)[1])
             open(folder + '/' + str(image_id) + file_type, 'wb').write(img_file.content)
-        counter = counter + 1
+        sub_folder_counter = sub_folder_counter + 1
     print("Finished scraping study " + data_study_id)
 
 # Main program
+sub_folder_counter = 1
+
 if (len(sys.argv)-1 != 1 or "https://radiopaedia.org/cases/" not in sys.argv[1]):
     print("Wrong argument, musst provide radiopaedia cases url!")
     exit()
