@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
+
 from requests_html import HTMLSession
-import requests
 from datetime import datetime
 import re
 import sys
@@ -13,13 +14,13 @@ def scrapeStudy(data_study_id):
     print("Fetching study json from " + picture_stacks_url +" ...")
     PARAMS = {'lang':lang}
 
-    picture_stacks_json = requests.get(url = picture_stacks_url, params = PARAMS)
-    data = picture_stacks_json.json()
+    picture_stacks_json = session.get(url = picture_stacks_url, params = PARAMS)
+    json_data = picture_stacks_json.json()
     print("Got study json!")
 
-    print("Found " + str(len(data)) + " image sets in study " + data_study_id)
+    print("Found " + str(len(json_data)) + " image sets in study " + data_study_id)
     # one image_set is one "modality" / "images" element in the json data
-    for image_set in data:
+    for image_set in json_data:
         modality = str(image_set["modality"])
         plane_projection = str(image_set["images"][0]["plane_projection"])
         aux_modality = str(image_set["images"][0]["aux_modality"])
@@ -35,7 +36,7 @@ def scrapeStudy(data_study_id):
         for image in pbar:
             img_url = image["fullscreen_filename"]
             image_id = image["id"]
-            img_file = requests.get(img_url)
+            img_file = session.get(img_url)
             file_type = "." + str(file_type_regex.search(img_url)[1])
             file_name = str(image_id) + str(file_type)
             pbar.set_description("Downloading %s" % file_name, True)
@@ -68,8 +69,15 @@ main_folder = case_name + "_" + str(datetime.now().strftime("%d_%m_%Y-%H_%M_%S")
 main_folder = illegal_char_regex.sub(" ", main_folder)
 Path(main_folder).mkdir(parents=True, exist_ok=True)
 
-print("\nSearching for data-study-ids ...")
 session = HTMLSession()
+#non-essential user-agent check
+try:
+    user_agent = session.get("https://httpbin.org/user-agent")
+    print("\nuser-agent: %s" % user_agent.json()["user-agent"])
+except:
+    pass
+
+print("\nSearching for data-study-ids ...")
 main_html = session.get(case_url)
 #main_html.html.render() -- uneccessrary
 content_div = main_html.html.find('div.user-generated-content', first=True)
