@@ -24,9 +24,9 @@ def scrapeStudy(data_study_id):
         modality = str(image_set["modality"])
         plane_projection = str(image_set["images"][0]["plane_projection"])
         aux_modality = str(image_set["images"][0]["aux_modality"])
-        # change units like "m/s" to "m per s" because / is an illegal character for folders
+        # change units like "mm/s" to "m per s" because / is an illegal character for folders
         sub_folder_name = (str(sub_folder_counter) + "_" + modality + "_" + plane_projection + "_" + aux_modality).replace("/", " per ")
-        # replace all other illegal folder chraracters
+        # replace most other illegal folder chraracters
         sub_folder_name = illegal_char_regex.sub(" ", sub_folder_name)
         folder = str(main_folder + "/" + sub_folder_name)
         Path(folder).mkdir(parents=True, exist_ok=True)
