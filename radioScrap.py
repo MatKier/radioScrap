@@ -4,7 +4,7 @@ from datetime import datetime
 import re
 import sys
 from tqdm import tqdm
-import pathlib
+from pathlib import Path
 
 #Helper function for getting all images associated with a specific data-study-id
 def scrapeStudy(data_study_id):
@@ -28,7 +28,7 @@ def scrapeStudy(data_study_id):
         # replace all other illegal folder chraracters
         sub_folder_name = illegal_char_regex.sub(" ", sub_folder_name)
         folder = str(main_folder + "/" + sub_folder_name)
-        pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
+        Path(folder).mkdir(parents=True, exist_ok=True)
         images = image_set["images"]
         print("Downloading " + str(len(images)) + " images for set \"" + sub_folder_name + "\" ...")
         for image in tqdm(images):
@@ -62,7 +62,7 @@ print("lang:\t\t" + lang)
 now = datetime.now()
 main_folder = case_name + "_" + str(datetime.now().strftime("%d_%m_%Y-%H_%M_%S"))
 main_folder = illegal_char_regex.sub(" ", main_folder)
-pathlib.Path(main_folder).mkdir(parents=True, exist_ok=True)
+Path(main_folder).mkdir(parents=True, exist_ok=True)
 
 print("\nSearching for data-study-ids ...")
 session = HTMLSession()
