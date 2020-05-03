@@ -31,12 +31,16 @@ def scrapeStudy(data_study_id):
         Path(folder).mkdir(parents=True, exist_ok=True)
         images = image_set["images"]
         print("Downloading " + str(len(images)) + " images for set \"" + sub_folder_name + "\" ...")
-        for image in tqdm(images):
+        pbar = tqdm(images, unit=" img")
+        for image in pbar:
             img_url = image["fullscreen_filename"]
             image_id = image["id"]
             img_file = requests.get(img_url)
             file_type = "." + str(file_type_regex.search(img_url)[1])
-            open(folder + '/' + str(image_id) + file_type, 'wb').write(img_file.content)
+            file_name = str(image_id) + str(file_type)
+            pbar.set_description("Downloading %s" % file_name, True)
+            open(folder + '/' + file_name, 'wb').write(img_file.content)
+        pbar.close()
         sub_folder_counter = sub_folder_counter + 1
     print("Finished scraping study " + data_study_id)
 
