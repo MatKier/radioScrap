@@ -56,11 +56,17 @@ case_url = str(sys.argv[1])
 print("URL:\t\t" + case_url)
 
 illegal_char_regex = re.compile(r"(\\|\/|:|\*|\?|\"|<|>|\|)")
-caseRegex = re.compile(r"^(https://.*cases/)(.*)(?:\?lang=(\w{1,3}))", flags=re.IGNORECASE)
+caseRegex = re.compile(r"^(https://radiopaedia\.org/cases/)(?:(.*)(?:\?lang=(\w{1,3}))|(.*))$", flags=re.IGNORECASE)
 file_type_regex = re.compile(r"(jpeg|jpg|png|gif|tiff)$", flags=re.IGNORECASE)
 
-case_name = str(caseRegex.search(case_url)[2])
 lang = str(caseRegex.search(case_url)[3])
+if (lang == "None" or lang is None):
+    # No ?lang=x element at the end
+    case_name = str(caseRegex.search(case_url)[4])
+    lang = ""
+else:
+    case_name = str(caseRegex.search(case_url)[2])
+
 print("case name:\t" + case_name)
 print("lang:\t\t" + lang)
 
